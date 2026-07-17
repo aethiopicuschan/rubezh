@@ -14,14 +14,16 @@ runs:
         go-version-file: ${{ github.action_path }}/go.mod
         cache: false
 
-    - name: Build and run Rubezh
+    - name: Install and run Rubezh
       shell: bash
+      env:
+        RUBEZH_VERSION: ${{ github.action_ref }}
       run: |
         extension=""
         if [[ "${RUNNER_OS}" == "Windows" ]]; then
           extension=".exe"
         fi
 
-        binary="${RUNNER_TEMP}/rubezh${extension}"
-        go -C "${GITHUB_ACTION_PATH}" build -o "${binary}" .
-        "${binary}" ./...
+        version="${RUBEZH_VERSION:-latest}"
+        GOBIN="${RUNNER_TEMP}" go install "github.com/aethiopicuschan/rubezh@${version}"
+        "${RUNNER_TEMP}/rubezh${extension}" ./...
