@@ -14,6 +14,14 @@ runs:
         go-version-file: ${{ github.action_path }}/go.mod
         cache: false
 
-    - name: Run Rubezh
+    - name: Build and run Rubezh
       shell: bash
-      run: go run "${GITHUB_ACTION_PATH}"
+      run: |
+        extension=""
+        if [[ "${RUNNER_OS}" == "Windows" ]]; then
+          extension=".exe"
+        fi
+
+        binary="${RUNNER_TEMP}/rubezh${extension}"
+        go -C "${GITHUB_ACTION_PATH}" build -o "${binary}" .
+        "${binary}" ./...
