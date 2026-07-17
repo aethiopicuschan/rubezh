@@ -1,0 +1,23 @@
+pre-commit:
+  parallel: true
+  commands:
+    go-lint:
+      env:
+        GOOS: linux
+        GOARCH: amd64
+      run: staticcheck ./...
+    go-fmt:
+      env:
+        GOOS: linux
+        GOARCH: amd64
+      run: |
+        files=$(gofmt -l .)
+        if [ -n "$files" ]; then
+          echo "The following files are not properly formatted:"
+          echo "$files"
+          exit 1
+        fi
+    go-modernize:
+      run: modernize -test ./...
+    typos:
+      run: typos
