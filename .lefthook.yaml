@@ -21,3 +21,5 @@ pre-commit:
       run: modernize -test ./...
     typos:
       run: typos
+    rubezh:
+      run: rubezh
