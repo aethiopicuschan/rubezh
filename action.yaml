@@ -1,4 +1,4 @@
-name: Rubezh
+name: Rubezh External Test Package Linter
 description: Enforce external test packages in Go test files
 
 branding:
@@ -17,4 +17,3 @@ runs:
     - name: Run Rubezh
       shell: bash
       run: go run "${GITHUB_ACTION_PATH}"
-

@@ -10,7 +10,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](/LICENSE)
 [![Release](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml/badge.svg)](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml)
-[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-rubezh-blue?logo=github-actions)](https://github.com/marketplace/actions/rubezh)
+[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-Rubezh-blue?logo=github-actions)](https://github.com/marketplace/actions/rubezh-external-test-package-linter)
 [![Go Reference](https://pkg.go.dev/badge/github.com/aethiopicuschan/rubezh.svg)](https://pkg.go.dev/github.com/aethiopicuschan/rubezh)
 [![CI](https://github.com/aethiopicuschan/rubezh/actions/workflows/ci.yaml/badge.svg)](https://github.com/aethiopicuschan/rubezh/actions/workflows/ci.yaml)
 [![codecov](https://codecov.io/gh/aethiopicuschan/rubezh/graph/badge.svg?token=xRkH4WZt6v)](https://codecov.io/gh/aethiopicuschan/rubezh)
