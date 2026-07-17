@@ -33,22 +33,29 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Build executable
+      - name: Build and package executable
         shell: bash
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
         run: |
-          extension=""
+          binary="rubezh"
           if [[ "$GOOS" == "windows" ]]; then
-            extension=".exe"
+            binary="rubezh.exe"
           fi
 
-          output="rubezh_${GOOS}_${GOARCH}${extension}"
-          go build -trimpath -ldflags="-s -w" -o "dist/${output}" .
+          mkdir -p package dist
+          go build -trimpath -ldflags="-s -w" -o "package/${binary}" .
 
-      - name: Upload executable
+          archive="rubezh_${GOOS}_${GOARCH}"
+          if [[ "$GOOS" == "windows" ]]; then
+            (cd package && zip "../dist/${archive}.zip" "${binary}")
+          else
+            tar -C package -czf "dist/${archive}.tar.gz" "${binary}"
+          fi
+
+      - name: Upload packaged executable
         uses: actions/upload-artifact@v4
         with:
           name: rubezh-${{ matrix.goos }}-${{ matrix.goarch }}
