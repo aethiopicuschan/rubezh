@@ -13,6 +13,17 @@ Rubezh is a Go linter that requires test files to use an external test package w
 This keeps tests
 focused on the package's public API instead of its unexported implementation.
 
+Rubezh accepts both Go source files and Go package patterns:
+
+```sh
+rubezh foo_test.go bar_test.go
+rubezh ./...
+```
+
+When no arguments are provided, Rubezh checks `./...`.
+The conventional `export_test.go` file may use the package under test without
+the `_test` suffix.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](/LICENSE)
 [![Release](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml/badge.svg)](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/aethiopicuschan/rubezh.svg)](https://pkg.go.dev/github.com/aethiopicuschan/rubezh)
