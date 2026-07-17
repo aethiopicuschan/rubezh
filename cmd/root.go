@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var configPath string
+
 var rootCmd = &cobra.Command{
 	Use:   "rubezh",
 	Short: "Enforce external test packages in Go",
@@ -21,12 +23,17 @@ implementation.`,
 }
 
 func run(cmd *cobra.Command, args []string) (err error) {
-	violations, err := lint(cmd.ErrOrStderr(), args)
+	cfg, err := loadConfig(configPath)
+	if err != nil {
+		return
+	}
+	violations, err := lint(cmd.ErrOrStderr(), args, cfg)
 	if err != nil {
 		return
 	}
 	if violations > 0 {
-		return fmt.Errorf("found %d test file(s) using an internal package", violations)
+		err = fmt.Errorf("found %d test file(s) using an internal package", violations)
+		return
 	}
 	return
 }
@@ -37,6 +44,8 @@ func Execute() (err error) {
 }
 
 func init() {
+	rootCmd.Flags().StringVarP(&configPath, "config", "c", "", "path to a JSON or YAML configuration file")
+
 	bi, ok := debug.ReadBuildInfo()
 	if ok && bi.Main.Version != "" {
 		rootCmd.Version = bi.Main.Version

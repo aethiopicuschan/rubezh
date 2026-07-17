@@ -14,37 +14,51 @@ import (
 )
 
 type listedPackage struct {
+	ImportPath   string
 	Dir          string
 	TestGoFiles  []string
 	XTestGoFiles []string
 }
 
-func lint(stderr io.Writer, args []string) (violations int, err error) {
+type target struct {
+	path       string
+	importPath string
+}
+
+func lint(stderr io.Writer, args []string, cfg config) (violations int, err error) {
 	files, patterns := splitArgs(args)
 	if len(files) == 0 && len(patterns) == 0 {
 		patterns = []string{"./..."}
 	}
 
-	packageFiles, err := filesForPatterns(patterns)
+	targets := make([]target, 0, len(files))
+	for _, path := range files {
+		targets = append(targets, target{path: path})
+	}
+
+	packageTargets, err := filesForPatterns(patterns)
 	if err != nil {
 		return
 	}
-	files = append(files, packageFiles...)
+	targets = append(targets, packageTargets...)
 
-	seen := make(map[string]struct{}, len(files))
-	for _, path := range files {
-		path, err = filepath.Abs(path)
+	seen := make(map[string]struct{}, len(targets))
+	for _, current := range targets {
+		current.path, err = filepath.Abs(current.path)
 		if err != nil {
-			err = fmt.Errorf("resolve %q: %w", path, err)
+			err = fmt.Errorf("resolve %q: %w", current.path, err)
 			return
 		}
-		if _, ok := seen[path]; ok {
+		if _, ok := seen[current.path]; ok {
 			continue
 		}
-		seen[path] = struct{}{}
+		seen[current.path] = struct{}{}
+		if cfg.excludesFile(current.path) {
+			continue
+		}
 
 		var violation bool
-		violation, err = checkFile(stderr, path)
+		violation, err = checkFile(stderr, current, cfg)
 		if err != nil {
 			return
 		}
@@ -67,7 +81,7 @@ func splitArgs(args []string) (files, patterns []string) {
 	return files, patterns
 }
 
-func filesForPatterns(patterns []string) (files []string, err error) {
+func filesForPatterns(patterns []string) (targets []target, err error) {
 	if len(patterns) == 0 {
 		return
 	}
@@ -98,7 +112,10 @@ func filesForPatterns(patterns []string) (files []string, err error) {
 			return
 		}
 		for _, name := range append(pkg.TestGoFiles, pkg.XTestGoFiles...) {
-			files = append(files, filepath.Join(pkg.Dir, name))
+			targets = append(targets, target{
+				path:       filepath.Join(pkg.Dir, name),
+				importPath: pkg.ImportPath,
+			})
 		}
 	}
 	if err = command.Wait(); err != nil {
@@ -129,18 +146,21 @@ func normalizePattern(pattern string) (normalized string) {
 	return
 }
 
-func checkFile(stderr io.Writer, path string) (ng bool, err error) {
-	if !strings.HasSuffix(strings.ToLower(path), "_test.go") {
+func checkFile(stderr io.Writer, current target, cfg config) (ng bool, err error) {
+	if !strings.HasSuffix(strings.ToLower(current.path), "_test.go") {
 		return
 	}
-	if filepath.Base(path) == "export_test.go" {
+	if filepath.Base(current.path) == "export_test.go" {
 		return
 	}
 
 	fileSet := token.NewFileSet()
-	file, err := parser.ParseFile(fileSet, path, nil, parser.PackageClauseOnly)
+	file, err := parser.ParseFile(fileSet, current.path, nil, parser.PackageClauseOnly)
 	if err != nil {
-		err = fmt.Errorf("parse %q: %w", path, err)
+		err = fmt.Errorf("parse %q: %w", current.path, err)
+		return
+	}
+	if cfg.excludesPackage(current.importPath, file.Name.Name) {
 		return
 	}
 	if strings.HasSuffix(file.Name.Name, "_test") {

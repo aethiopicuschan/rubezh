@@ -8,6 +8,14 @@
   <i>рубеж — Enforces external test packages in Go</i>
 </p>
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](/LICENSE)
+[![Release](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml/badge.svg)](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml)
+[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-rubezh-blue?logo=github-actions)](https://github.com/marketplace/actions/rubezh)
+[![Go Reference](https://pkg.go.dev/badge/github.com/aethiopicuschan/rubezh.svg)](https://pkg.go.dev/github.com/aethiopicuschan/rubezh)
+[![Go Report Card](https://goreportcard.com/badge/github.com/aethiopicuschan/rubezh)](https://goreportcard.com/report/github.com/aethiopicuschan/rubezh)
+[![CI](https://github.com/aethiopicuschan/rubezh/actions/workflows/ci.yaml/badge.svg)](https://github.com/aethiopicuschan/rubezh/actions/workflows/ci.yaml)
+[![codecov](https://codecov.io/gh/aethiopicuschan/rubezh/graph/badge.svg?token=xRkH4WZt6v)](https://codecov.io/gh/aethiopicuschan/rubezh)
+
 Rubezh is a Go linter that requires test files to use an external test package whose name ends in `_test` (for example, `package foo_test`).
 
 This keeps tests
@@ -21,15 +29,34 @@ rubezh ./...
 ```
 
 When no arguments are provided, Rubezh checks `./...`.
-The conventional `export_test.go` file may use the package under test without
-the `_test` suffix.
+The conventional `export_test.go` file may use the package under test without the `_test` suffix.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](/LICENSE)
-[![Release](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml/badge.svg)](https://github.com/aethiopicuschan/rubezh/actions/workflows/release.yaml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/aethiopicuschan/rubezh.svg)](https://pkg.go.dev/github.com/aethiopicuschan/rubezh)
-[![Go Report Card](https://goreportcard.com/badge/github.com/aethiopicuschan/rubezh)](https://goreportcard.com/report/github.com/aethiopicuschan/rubezh)
-[![CI](https://github.com/aethiopicuschan/rubezh/actions/workflows/ci.yaml/badge.svg)](https://github.com/aethiopicuschan/rubezh/actions/workflows/ci.yaml)
-[![codecov](https://codecov.io/gh/aethiopicuschan/rubezh/graph/badge.svg?token=xRkH4WZt6v)](https://codecov.io/gh/aethiopicuschan/rubezh)
+## Configuration
+
+Rubezh automatically loads `.rubezh.yaml`, `.rubezh.yml`, or `.rubezh.json` from the current directory. Use `--config` (or `-c`) to specify another file.
+
+Files and packages can be excluded with glob patterns. File patterns are relative to the directory containing the configuration file. Package patterns match either a Go import path or a package name.
+
+```yaml
+exclude:
+  files:
+    - "**/generated_test.go"
+    - "internal/legacy/*_test.go"
+  packages:
+    - "github.com/example/project/generated/**"
+    - "legacy"
+```
+
+The equivalent JSON structure is also supported:
+
+```json
+{
+  "exclude": {
+    "files": ["**/generated_test.go"],
+    "packages": ["github.com/example/project/generated/**"]
+  }
+}
+```
 
 ## How to install
 

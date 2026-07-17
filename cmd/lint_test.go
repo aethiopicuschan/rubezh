@@ -71,7 +71,7 @@ func TestLint(t *testing.T) {
 			}
 
 			var stderr bytes.Buffer
-			violations, err := cmd.Lint(&stderr, paths)
+			violations, err := cmd.Lint(&stderr, paths, cmd.Config{})
 
 			assert.NoError(t, err)
 			assert.Equal(t, tt.wantViolations, violations)
