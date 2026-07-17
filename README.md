@@ -37,3 +37,22 @@ git clone https://github.com/aethiopicuschan/rubezh.git
 cd rubezh
 go build -o rubezh
 ```
+
+## GitHub Actions
+
+Add Rubezh to your workflow after checking out the repository:
+
+```yaml
+name: Rubezh
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aethiopicuschan/rubezh@v1
+```

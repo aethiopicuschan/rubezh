@@ -1,0 +1,20 @@
+name: Rubezh
+description: Enforce external test packages in Go test files
+
+branding:
+  icon: shield
+  color: blue
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: ${{ github.action_path }}/go.mod
+        cache: false
+
+    - name: Run Rubezh
+      shell: bash
+      run: go run "${GITHUB_ACTION_PATH}"
+
